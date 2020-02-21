@@ -86,8 +86,8 @@ var Word = function () {
   this.prevWord = null
   this.nextWord = null
 
-  // Adjective properties
-  this.adjHeadTerm = null
+  // Adjective/Article properties
+  this.headTerm = null
 }
 
 // A layer holds words and may be subordinate to a word
@@ -131,6 +131,7 @@ export default {
       infinitive: 'purple',
       relative: 'yellow',
       adjective: 'orange',
+      article: 'grey',
       conjunction: 'red'
     }
   }),
@@ -207,21 +208,21 @@ export default {
         // Single-word actions
         if (this.selectedWords.length === 1) {
           let word = this.selectedWords[0]
-          // Adjective actions
-          if (word.pos === 'adjective') {
-            // Mark head noun
+          // Adjective/Article actions
+          if (['adjective', 'article'].indexOf(word.pos) !== -1) {
+            // Mark head term
             actions.push({
               title: 'Head Term',
               action: function () {
                 _this.pendingActionCallback = function (w) {
-                  word.adjHeadTerm = w
+                  word.headTerm = w
 
                   // Finish our selection/action process
                   _this.clearSelection()
                 }
                 _this.activeSelectionAction = this
               },
-              instructions: 'Select a word as this adjective\'s head term'
+              instructions: 'Select a word as this word\'s head term'
             })
           }
         }
@@ -232,7 +233,7 @@ export default {
           action: function () {
             _this.activeSelectionAction = this
           },
-          actions: [ 'verb', 'participle', 'infinitive', 'relative', 'adjective', 'conjunction' ].map((pos) => {
+          actions: [ 'verb', 'participle', 'infinitive', 'relative', 'adjective', 'article', 'conjunction' ].map((pos) => {
             return {
               title: pos,
               action: () => {
@@ -393,9 +394,10 @@ export default {
       // Part-of-speech-specific logic
       switch (word.pos) {
         case 'adjective':
-          if (word.adjHeadTerm) {
-            word.adjHeadTerm.highlightColor = this.posColors[word.pos]
-            word.adjHeadTerm.isHighlighted = true
+        case 'article':
+          if (word.headTerm) {
+            word.headTerm.highlightColor = this.posColors[word.pos]
+            word.headTerm.isHighlighted = true
           }
           break
       }
@@ -404,8 +406,9 @@ export default {
       // Part-of-speech-specific logic
       switch (word.pos) {
         case 'adjective':
-          if (word.adjHeadTerm) {
-            word.adjHeadTerm.isHighlighted = false
+        case 'article':
+          if (word.headTerm) {
+            word.headTerm.isHighlighted = false
           }
           break
       }
