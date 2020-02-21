@@ -82,6 +82,9 @@ var Word = function () {
 
   this.prevWord = null
   this.nextWord = null
+
+  // Adjective properties
+  this.adjHeadTerm = null
 }
 
 // A layer holds words and may be subordinate to a word
@@ -124,6 +127,7 @@ export default {
       participle: 'green',
       infinitive: 'purple',
       relative: 'yellow',
+      adjective: 'orange',
       conjunction: 'red'
     }
   }),
@@ -197,13 +201,35 @@ export default {
 
       // Word-related actions
       if (this.selectedWords.length > 0) {
+        // Single-word actions
+        if (this.selectedWords.length === 1) {
+          let word = this.selectedWords[0]
+          // Adjective actions
+          if (word.pos === 'adjective') {
+            // Mark head noun
+            actions.push({
+              title: 'Head Term',
+              action: function () {
+                _this.pendingActionCallback = function (w) {
+                  word.adjHeadTerm = w
+
+                  // Finish our selection/action process
+                  _this.clearSelection()
+                }
+                _this.activeSelectionAction = this
+              },
+              instructions: 'Select a word as this adjective\'s head term'
+            })
+          }
+        }
+
         // Mark part of speech (has sub menu)
         actions.push({
           title: 'Part of Speech',
           action: function () {
             _this.activeSelectionAction = this
           },
-          actions: [ 'verb', 'participle', 'infinitive', 'relative', 'conjunction' ].map((pos) => {
+          actions: [ 'verb', 'participle', 'infinitive', 'relative', 'adjective', 'conjunction' ].map((pos) => {
             return {
               title: pos,
               action: () => {
