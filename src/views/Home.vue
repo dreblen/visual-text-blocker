@@ -45,15 +45,17 @@
     </v-row>
     <v-expand-transition>
       <v-footer app v-if="haveActiveSelection">
+        <v-row v-if="activeSelectionAction && activeSelectionAction.instructions">
+          <v-col class="text-center">
+            {{ activeSelectionAction.instructions }}
+          </v-col>
+        </v-row>
         <v-row>
           <v-row class="overflow-x-auto pb-3" style="width: 100vw; flex-wrap: nowrap;">
             <v-col v-for="action in selectionActions" :key="action.title">
               <v-btn @click.stop="action.action">
                 {{ action.title }}
               </v-btn>
-            </v-col>
-            <v-col cols="9" v-if="activeSelectionAction && activeSelectionAction.instructions">
-              {{ activeSelectionAction.instructions }}
             </v-col>
           </v-row>
         </v-row>
