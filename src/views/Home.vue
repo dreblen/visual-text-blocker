@@ -209,10 +209,18 @@ export default {
           action: function () {
             _this.pendingActionCallback = function (w) {
               // Make a new layer with our selected words and remove the words
-              // from their current layers
+              // from their current layers (storing the first word's original
+              // layer for later in case we need it)
               let layer = new Layer()
               layer.parent = w
+              let previousLayer = null
               for (let word of this.selectedWords) {
+                // Store the layer of the first word
+                if (previousLayer === null) {
+                  previousLayer = word.layer
+                }
+
+                // Change the word's layer
                 layer.words.push(word)
                 word.layer.words = word.layer.words.filter((w) => {
                   return w !== word
@@ -221,10 +229,15 @@ export default {
               }
 
               // Add our layer to the global list after the parent word's layer
+              // (or the first selected word's layer if there's no parent)
               let index = 0
+              let targetID = previousLayer.id
+              if (w !== null) {
+                targetID = w.layer.id
+              }
               for (let i in _this.layers) {
                 let layer = _this.layers[i]
-                if (layer.id === w.layer.id) {
+                if (layer.id === targetID) {
                   index = parseInt(i) + 1
                   break
                 }
@@ -237,7 +250,10 @@ export default {
             }
             _this.activeSelectionAction = this
           },
-          instructions: 'Select a word as this layer\'s parent'
+          actions: [
+            { title: 'Top Level', action: () => { this.wordClicked(null) } }
+          ],
+          instructions: 'Select a word as this layer\'s parent, or select an action below'
         })
       }
 
