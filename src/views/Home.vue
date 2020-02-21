@@ -34,7 +34,9 @@
               v-for="word in layer.words"
               :key="word.id"
               @click.stop="wordClicked(word)"
-              :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? 'yellow' : '', (posColors[word.pos]) ? posColors[word.pos] + '--text' : '']"
+              @mouseover="wordMouseOver(word)"
+              @mouseout="wordMouseOut(word)"
+              :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? (word.highlightColor || 'yellow') : '', (posColors[word.pos]) ? posColors[word.pos] + '--text' : '']"
               style="border-radius: 10px;"
             >
               {{ word.value }}
@@ -79,6 +81,7 @@ var Word = function () {
 
   this.isSelected = false
   this.isHighlighted = false
+  this.highlightColor = 'yellow'
 
   this.prevWord = null
   this.nextWord = null
@@ -385,6 +388,27 @@ export default {
     },
     layerClicked: function (layer) {
       layer.isSelected = !layer.isSelected
+    },
+    wordMouseOver: function (word) {
+      // Part-of-speech-specific logic
+      switch (word.pos) {
+        case 'adjective':
+          if (word.adjHeadTerm) {
+            word.adjHeadTerm.highlightColor = this.posColors[word.pos]
+            word.adjHeadTerm.isHighlighted = true
+          }
+          break
+      }
+    },
+    wordMouseOut: function (word) {
+      // Part-of-speech-specific logic
+      switch (word.pos) {
+        case 'adjective':
+          if (word.adjHeadTerm) {
+            word.adjHeadTerm.isHighlighted = false
+          }
+          break
+      }
     },
     wordClicked: function (word) {
       // If we have a callback queued, use that instead of our default logic
