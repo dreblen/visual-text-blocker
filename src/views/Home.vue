@@ -257,6 +257,30 @@ export default {
         })
       }
 
+      // Layer-related actions
+      if (this.selectedLayers.length > 0) {
+        // Change parent
+        actions.push({
+          title: 'Change Parent',
+          action: function () {
+            _this.pendingActionCallback = function (w) {
+              // Change the parent of each selected layer
+              _this.selectedLayers.forEach((layer) => {
+                layer.parent = w
+              })
+
+              // Finish our selection/action process
+              _this.clearSelection()
+            }
+            _this.activeSelectionAction = this
+          },
+          actions: [
+            { title: 'Top Level', action: () => { this.wordClicked(null) } }
+          ],
+          instructions: 'Select a word as this layer\'s parent, or select an action below'
+        })
+      }
+
       return actions
     },
     // true/false on whether or not anything is currently selected
