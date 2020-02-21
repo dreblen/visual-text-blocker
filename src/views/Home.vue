@@ -27,6 +27,9 @@
             >
               mdi-drag
             </v-icon>
+            <v-icon v-for="i in layer.getNumParents()" :key="i" class="mx-3">
+              mdi-keyboard-tab
+            </v-icon>
             <span
               v-for="word in layer.words"
               :key="word.id"
@@ -92,6 +95,15 @@ var Layer = function () {
   this.words = []
 
   this.isSelected = false
+}
+
+// Returns the number of Layer levels above the Layer object
+Layer.prototype.getNumParents = function () {
+  if (this.parent === null) {
+    return 0
+  } else {
+    return 1 + this.parent.layer.getNumParents()
+  }
 }
 
 export default {
