@@ -418,6 +418,7 @@ export default {
       this.layers = layers
       this.$root.layers = this.layers
     },
+    // Reads an uploaded file and tries to import it as layer and word data
     fileUploaded: function (file) {
       let reader = new FileReader()
       reader.onload = (ev) => {
