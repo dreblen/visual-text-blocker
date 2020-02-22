@@ -86,6 +86,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 let Latin = require('parse-latin')
 
 // A word holds text
@@ -175,6 +176,9 @@ export default {
     }
   }),
   computed: {
+    ...mapState([
+      'shouldReset'
+    ]),
     // Retrieves only the sentence nodes from the parsed NLCST data
     parsedSentences: function () {
       // We can't do anything if the text hasn't been parsed yet or if we're
@@ -368,6 +372,25 @@ export default {
     // true/false on whether or not anything is currently selected
     haveActiveSelection: function () {
       return this.selectedWords.length > 0 || this.selectedLayers.length > 0
+    }
+  },
+  watch: {
+    // Wait for a reset "signal" so we know when to start over
+    shouldReset: function (val) {
+      if (val === false) {
+        return
+      }
+
+      // Make sure we aren't storing any selection
+      this.clearSelection()
+
+      // Empty out our text and layers
+      this.rawText = ''
+      this.parsedText = null
+      this.layers = []
+
+      // Mark the reset as complete
+      this.$store.commit('reset', false)
     }
   },
   methods: {

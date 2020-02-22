@@ -21,6 +21,14 @@
             Export
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="resetState">
+          <v-list-item-icon>
+            <v-icon>mdi-restart</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            Start Over
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-content>
@@ -42,6 +50,10 @@ export default {
         return layer.serialize()
       })
       saveAs(new Blob([JSON.stringify(serialized)], { type: 'text/plain;charset=utf-8' }), 'export.txt')
+      this.navOpen = false
+    },
+    resetState: function () {
+      this.$store.commit('reset')
       this.navOpen = false
     }
   }
