@@ -158,7 +158,6 @@ export default {
     // Text and layers
     rawText: '',
     parsedText: null,
-    layers: [],
 
     // Actions and selections
     activeSelectionAction: null,
@@ -177,6 +176,7 @@ export default {
   }),
   computed: {
     ...mapState([
+      'layers',
       'shouldReset'
     ]),
     // Retrieves only the sentence nodes from the parsed NLCST data
@@ -329,7 +329,10 @@ export default {
                 }
               }
               // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-              _this.layers.splice(index, 0, layer)
+              _this.$store.commit('spliceLayers', {
+                index,
+                layer
+              })
 
               // Finish our selection/action process
               _this.clearSelection()
@@ -387,7 +390,7 @@ export default {
       // Empty out our text and layers
       this.rawText = ''
       this.parsedText = null
-      this.layers = []
+      this.$store.commit('setLayers', [])
 
       // Mark the reset as complete
       this.$store.commit('reset', false)
@@ -438,8 +441,7 @@ export default {
       }
 
       // Establish our global layer list
-      this.layers = layers
-      this.$root.layers = this.layers
+      this.$store.commit('setLayers', layers)
     },
     // Reads an uploaded file and tries to import it as layer and word data
     fileUploaded: function (file) {
@@ -499,8 +501,7 @@ export default {
         }
 
         // Store our layers globally, and mark our text as parsed
-        this.layers = layers
-        this.$root.layers = this.layers
+        this.$store.commit('setLayers', layers)
         this.parsedText = true
       }
       reader.readAsText(file)

@@ -13,7 +13,7 @@
       app
     >
       <v-list>
-        <v-list-item @click="exportData" :disabled="!$root.layers">
+        <v-list-item @click="exportData" :disabled="$store.state.layers.length === 0">
           <v-list-item-icon>
             <v-icon>mdi-export</v-icon>
           </v-list-item-icon>
@@ -45,8 +45,7 @@ export default {
   }),
   methods: {
     exportData: function () {
-      let layers = this.$root.layers
-      let serialized = layers.map((layer) => {
+      let serialized = this.$store.state.layers.map((layer) => {
         return layer.serialize()
       })
       saveAs(new Blob([JSON.stringify(serialized)], { type: 'text/plain;charset=utf-8' }), 'export.txt')
