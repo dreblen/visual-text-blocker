@@ -3,14 +3,30 @@
     <template v-if="parsedText === null">
       <v-row>
         <v-col>
-          <v-textarea
-            v-model="rawText"
-          />
+          <v-row>
+            <v-col>
+              <v-textarea
+                label="Enter raw text to be parsed"
+                v-model="rawText"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+              <v-spacer />
+              <v-btn @click="parse">Parse</v-btn>
+          </v-row>
         </v-col>
       </v-row>
       <v-row>
-        <v-spacer />
-        <v-btn @click="parse">Parse</v-btn>
+        <v-col>
+          <p class="headline text-center">Or</p>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-file-input
+          label="Uploaded exported file"
+          @change="fileUploaded"
+          />
       </v-row>
     </template>
     <v-row>
@@ -90,6 +106,18 @@ var Word = function () {
   this.headTerm = null
 }
 
+Word.prototype.serialize = function () {
+  return JSON.parse(JSON.stringify({
+    id: this.id,
+    pos: this.pos,
+    value: this.value,
+    layer: this.layer.id,
+    prevWord: (this.prevWord) ? this.prevWord.id : null,
+    nextWord: (this.nextWord) ? this.nextWord.id : null,
+    headTerm: (this.headTerm) ? this.headTerm.id : null
+  }))
+}
+
 // A layer holds words and may be subordinate to a word
 // TODO: Add categorization of the layer type (e.g., sentence, cause, phrase,
 // association [e.g., article/noun, adj/noun]) so we can handle/render them
@@ -101,6 +129,17 @@ var Layer = function () {
   this.words = []
 
   this.isSelected = false
+}
+
+Layer.prototype.serialize = function () {
+  return JSON.parse(JSON.stringify({
+    id: this.id,
+    order: this.order,
+    parent: (this.parent) ? this.parent.id : null,
+    words: this.words.map((word) => {
+      return word.serialize()
+    })
+  }))
 }
 
 // Returns the number of Layer levels above the Layer object
@@ -138,8 +177,9 @@ export default {
   computed: {
     // Retrieves only the sentence nodes from the parsed NLCST data
     parsedSentences: function () {
-      // We can't do anything if the text hasn't been parsed yet
-      if (this.parsedText === null) {
+      // We can't do anything if the text hasn't been parsed yet or if we're
+      // working with an imported layer file
+      if (this.parsedText === null || this.parsedText === true) {
         return []
       }
 
@@ -376,6 +416,70 @@ export default {
 
       // Establish our global layer list
       this.layers = layers
+      this.$root.layers = this.layers
+    },
+    fileUploaded: function (file) {
+      let reader = new FileReader()
+      reader.onload = (ev) => {
+        let json = JSON.parse(ev.target.result)
+        let layers = []
+        let words = []
+
+        // Recreate our layers and words
+        json.forEach((l) => {
+          // Make a new layer with the right values
+          let layer = new Layer()
+          layer.id = l.id
+          layer.order = l.order
+          layer.parent = l.parent
+
+          // Make a new word with the right values
+          l.words.forEach((w) => {
+            let word = new Word()
+            word.id = w.id
+            word.pos = w.pos
+            word.value = w.value
+            word.layer = layer
+            word.prevWord = w.prevWord
+            word.nextWord = w.nextWord
+            word.headTerm = w.headTerm
+
+            // Store the word in its new layer
+            layer.words.push(word)
+
+            // Store the word temporarily in an easy-to-access array
+            words[word.id] = word
+          })
+
+          // Store our new layer
+          layers.push(layer)
+        })
+
+        // Re-assign object values from IDs now that our layers and words exist
+        layers.forEach((l) => {
+          if (l.parent !== null) {
+            l.parent = words[l.parent]
+          }
+        })
+        for (let w in words) {
+          let word = words[w]
+          if (word.prevWord !== null) {
+            word.prevWord = words[word.prevWord]
+          }
+          if (word.nextWord !== null) {
+            word.nextWord = words[word.nextWord]
+          }
+          if (word.headTerm !== null) {
+            word.headTerm = words[word.headTerm]
+          }
+        }
+
+        // Store our layers globally, and mark our text as parsed
+        this.layers = layers
+        this.$root.layers = this.layers
+        this.parsedText = true
+      }
+      reader.readAsText(file)
     },
     layerMouseOver: function (layer) {
       if (layer.parent) {

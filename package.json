@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.4.3",
+    "file-saver": "^2.0.2",
     "parse-latin": "^4.2.1",
     "vue": "^2.6.10",
     "vue-router": "^3.1.3",
