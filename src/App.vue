@@ -7,6 +7,13 @@
       :hide-on-scroll="true"
     >
       <v-app-bar-nav-icon @click.stop="navOpen = !navOpen" />
+      <v-spacer />
+      <v-btn icon @click.stop="undo" :disabled="!canUndo">
+        <v-icon>mdi-undo</v-icon>
+      </v-btn>
+      <v-btn icon @click.stop="redo" :disabled="!canRedo">
+        <v-icon>mdi-redo</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-navigation-drawer
       v-model="navOpen"
@@ -37,13 +44,26 @@
   </v-app>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 import { saveAs } from 'file-saver'
 
 export default {
   data: () => ({
     navOpen: false
   }),
+  computed: {
+    ...mapGetters([
+      'canUndo',
+      'canRedo'
+    ])
+  },
   methods: {
+    undo: function () {
+      this.$store.dispatch('undo')
+    },
+    redo: function () {
+      this.$store.dispatch('redo')
+    },
     exportData: function () {
       let serialized = this.$store.state.layers.map((layer) => {
         return layer.serialize()

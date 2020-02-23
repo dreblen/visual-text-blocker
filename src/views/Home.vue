@@ -198,6 +198,10 @@ export default {
               title: 'Head Term',
               action: function () {
                 _this.pendingActionCallback = function (w) {
+                  // Store our current state before making changes
+                  this.$store.commit('saveLayers')
+
+                  // Set our word's head term
                   word.headTerm = w
 
                   // Finish our selection/action process
@@ -220,7 +224,11 @@ export default {
             return {
               title: pos,
               action: () => {
+                // Store our current state before making changes
+                this.$store.commit('saveLayers')
+
                 this.selectedWords.forEach((w) => {
+                  // Set our word's part of speech
                   w.pos = pos
                 })
               }
@@ -233,6 +241,9 @@ export default {
           title: 'Make Layer',
           action: function () {
             _this.pendingActionCallback = function (w) {
+              // Store our current state before making changes
+              this.$store.commit('saveLayers')
+
               // Make a new layer with our selected words and remove the words
               // from their current layers (storing the first word's original
               // layer for later in case we need it)
@@ -292,6 +303,9 @@ export default {
           title: 'Change Parent',
           action: function () {
             _this.pendingActionCallback = function (w) {
+              // Store our current state before making changes
+              this.$store.commit('saveLayers')
+
               // Change the parent of each selected layer
               _this.selectedLayers.forEach((layer) => {
                 layer.parent = w
