@@ -70,7 +70,7 @@ export default {
       this.navOpen = false
     },
     resetState: function () {
-      this.$store.commit('reset')
+      this.$store.dispatch('reset')
       this.navOpen = false
     }
   }

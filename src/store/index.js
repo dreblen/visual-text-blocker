@@ -105,12 +105,24 @@ export default new Vuex.Store({
     },
     importLayers: function (state, json) {
       state.layers = unserializeLayers(json)
-    },
-    reset: function (state, val) {
-      state.shouldReset = (val === undefined) ? true : val
     }
   },
   actions: {
+    reset: function ({ state, commit }) {
+      // Update our indicator value for the benefit of any listeners
+      state.shouldReset = true
+
+      // Clear out our layer data and history
+      commit('setLayers', [])
+      state.layerHistory = []
+      state.layerHistoryDepth = 0
+
+      // Update our indicator again to show completion, giving any listeners a
+      // chance to respond to the first change above
+      Vue.nextTick(() => {
+        state.shouldReset = false
+      })
+    },
     undo: function ({ state, getters, commit }) {
       // See if we're able to go back any further
       if (!getters.canUndo) {

@@ -340,13 +340,9 @@ export default {
       // Make sure we aren't storing any selection
       this.clearSelection()
 
-      // Empty out our text and layers
+      // Empty out our text
       this.rawText = ''
       this.parsedText = null
-      this.$store.commit('setLayers', [])
-
-      // Mark the reset as complete
-      this.$store.commit('reset', false)
     }
   },
   methods: {
