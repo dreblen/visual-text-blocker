@@ -23,6 +23,7 @@ function unserializeLayers (json) {
     layer.id = l.id
     layer.order = l.order
     layer.parent = l.parent
+    layer.companionText = l.companionText
 
     // Make a new word with the right values
     l.words.forEach((w) => {

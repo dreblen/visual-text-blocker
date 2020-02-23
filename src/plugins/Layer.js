@@ -8,6 +8,8 @@ var Layer = function () {
   this.parent = null // Word
   this.words = []
 
+  this.companionText = null
+
   this.isSelected = false
 }
 
@@ -16,6 +18,7 @@ Layer.prototype.serialize = function () {
     id: this.id,
     order: this.order,
     parent: (this.parent) ? this.parent.id : null,
+    companionText: this.companionText,
     words: this.words.map((word) => {
       return word.serialize()
     })
