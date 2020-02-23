@@ -24,7 +24,7 @@
       </v-row>
       <v-row>
         <v-file-input
-          label="Uploaded exported file"
+          label="Upload exported file"
           @change="fileUploaded"
           />
       </v-row>
