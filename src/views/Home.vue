@@ -87,70 +87,9 @@
 
 <script>
 import { mapState } from 'vuex'
+import Layer from '@/plugins/Layer'
+import Word from '@/plugins/Word'
 let Latin = require('parse-latin')
-
-// A word holds text
-var Word = function () {
-  this.id = Math.random()
-  this.pos = null
-  this.value = ''
-  this.layer = null
-
-  this.isSelected = false
-  this.isHighlighted = false
-  this.highlightColor = 'yellow'
-
-  this.prevWord = null
-  this.nextWord = null
-
-  // Adjective/Article properties
-  this.headTerm = null
-}
-
-Word.prototype.serialize = function () {
-  return JSON.parse(JSON.stringify({
-    id: this.id,
-    pos: this.pos,
-    value: this.value,
-    layer: this.layer.id,
-    prevWord: (this.prevWord) ? this.prevWord.id : null,
-    nextWord: (this.nextWord) ? this.nextWord.id : null,
-    headTerm: (this.headTerm) ? this.headTerm.id : null
-  }))
-}
-
-// A layer holds words and may be subordinate to a word
-// TODO: Add categorization of the layer type (e.g., sentence, cause, phrase,
-// association [e.g., article/noun, adj/noun]) so we can handle/render them
-// appropriately based on user preference
-var Layer = function () {
-  this.id = Math.random()
-  this.order = null
-  this.parent = null // Word
-  this.words = []
-
-  this.isSelected = false
-}
-
-Layer.prototype.serialize = function () {
-  return JSON.parse(JSON.stringify({
-    id: this.id,
-    order: this.order,
-    parent: (this.parent) ? this.parent.id : null,
-    words: this.words.map((word) => {
-      return word.serialize()
-    })
-  }))
-}
-
-// Returns the number of Layer levels above the Layer object
-Layer.prototype.getNumParents = function () {
-  if (this.parent === null) {
-    return 0
-  } else {
-    return 1 + this.parent.layer.getNumParents()
-  }
-}
 
 export default {
   name: 'home',
