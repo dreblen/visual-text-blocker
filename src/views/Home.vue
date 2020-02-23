@@ -400,61 +400,9 @@ export default {
     fileUploaded: function (file) {
       let reader = new FileReader()
       reader.onload = (ev) => {
-        let json = JSON.parse(ev.target.result)
-        let layers = []
-        let words = []
-
-        // Recreate our layers and words
-        json.forEach((l) => {
-          // Make a new layer with the right values
-          let layer = new Layer()
-          layer.id = l.id
-          layer.order = l.order
-          layer.parent = l.parent
-
-          // Make a new word with the right values
-          l.words.forEach((w) => {
-            let word = new Word()
-            word.id = w.id
-            word.pos = w.pos
-            word.value = w.value
-            word.layer = layer
-            word.prevWord = w.prevWord
-            word.nextWord = w.nextWord
-            word.headTerm = w.headTerm
-
-            // Store the word in its new layer
-            layer.words.push(word)
-
-            // Store the word temporarily in an easy-to-access array
-            words[word.id] = word
-          })
-
-          // Store our new layer
-          layers.push(layer)
-        })
-
-        // Re-assign object values from IDs now that our layers and words exist
-        layers.forEach((l) => {
-          if (l.parent !== null) {
-            l.parent = words[l.parent]
-          }
-        })
-        for (let w in words) {
-          let word = words[w]
-          if (word.prevWord !== null) {
-            word.prevWord = words[word.prevWord]
-          }
-          if (word.nextWord !== null) {
-            word.nextWord = words[word.nextWord]
-          }
-          if (word.headTerm !== null) {
-            word.headTerm = words[word.headTerm]
-          }
-        }
-
         // Store our layers globally, and mark our text as parsed
-        this.$store.commit('setLayers', layers)
+        let json = JSON.parse(ev.target.result)
+        this.$store.commit('importLayers', json)
         this.parsedText = true
       }
       reader.readAsText(file)

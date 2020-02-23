@@ -76,6 +76,9 @@ export default new Vuex.Store({
     shouldReset: false
   },
   getters: {
+    serializedLayers: function (state) {
+      return serializeLayers(state.layers)
+    },
     canUndo: function (state) {
       return state.layerHistory.length > 0 && state.layerHistoryDepth !== state.layerHistory.length
     },
@@ -99,6 +102,9 @@ export default new Vuex.Store({
     },
     spliceLayers: function (state, payload) {
       state.layers.splice(payload.index, 0, payload.layer)
+    },
+    importLayers: function (state, json) {
+      state.layers = unserializeLayers(json)
     },
     reset: function (state, val) {
       state.shouldReset = (val === undefined) ? true : val

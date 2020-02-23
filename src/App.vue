@@ -53,6 +53,7 @@ export default {
   }),
   computed: {
     ...mapGetters([
+      'serializedLayers',
       'canUndo',
       'canRedo'
     ])
@@ -65,10 +66,7 @@ export default {
       this.$store.dispatch('redo')
     },
     exportData: function () {
-      let serialized = this.$store.state.layers.map((layer) => {
-        return layer.serialize()
-      })
-      saveAs(new Blob([JSON.stringify(serialized)], { type: 'text/plain;charset=utf-8' }), 'export.txt')
+      saveAs(new Blob([JSON.stringify(this.serializedLayers)], { type: 'text/plain;charset=utf-8' }), 'export.txt')
       this.navOpen = false
     },
     resetState: function () {
