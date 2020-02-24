@@ -71,7 +71,7 @@
               </span>
             </span>
           </p>
-          <template v-if="preferences.shouldShowCompanionText.value === true">
+          <template v-if="preferences.display.settings.shouldShowCompanionText.value === true">
             <p v-if="companionTextLayer === layer.id">
               <v-text-field
                 label="Companion Text"
@@ -330,7 +330,7 @@ export default {
         // Single-layer actions
         if (this.selectedLayers.length === 1) {
           // Add companion text
-          if (this.preferences.shouldShowCompanionText.value === true) {
+          if (this.preferences.display.settings.shouldShowCompanionText.value === true) {
             actions.push({
               title: 'Companion Text',
               action: function () {

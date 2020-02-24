@@ -76,10 +76,16 @@ export default new Vuex.Store({
     layerHistoryDepth: 0,
 
     preferences: {
-      shouldShowCompanionText: {
-        type: Boolean,
-        value: true,
-        description: 'Show companion text along with layer data'
+      display: {
+        description: 'Display Settings',
+        settings: {
+          shouldShowCompanionText: {
+            type: 'boolean',
+            default: true,
+            value: true,
+            description: 'Show companion text along with layer data'
+          }
+        }
       }
     },
 
@@ -98,7 +104,7 @@ export default new Vuex.Store({
   },
   mutations: {
     setPreference: function (state, pref) {
-      state.preferences[pref.name].value = pref.value
+      state.preferences[pref.groupName].settings[pref.name].value = (pref.value !== null) ? pref.value : state.preferences[pref.groupName].settings[pref.name].default
     },
     // Saves the current state of the layers so it can be returned to via history
     saveLayers: function (state) {
