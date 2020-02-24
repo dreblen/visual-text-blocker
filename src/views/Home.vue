@@ -52,8 +52,8 @@
               @click.stop="wordClicked(word)"
               @mouseover="wordMouseOver(word)"
               @mouseout="wordMouseOut(word)"
-              :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? (word.highlightColor || 'yellow') : '', (posColors[word.pos]) ? posColors[word.pos] + '--text' : '']"
-              style="border-radius: 10px;"
+              :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? (word.highlightColor || 'yellow') : '']"
+              :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black'}"
             >
               {{ word.value }}
               <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
@@ -128,18 +128,7 @@ export default {
     activeSelectionAction: null,
     pendingActionCallback: null,
     companionText: null,
-    companionTextLayer: null,
-
-    // Theming
-    posColors: {
-      verb: 'blue',
-      participle: 'green',
-      infinitive: 'purple',
-      relative: 'yellow',
-      adjective: 'orange',
-      article: 'grey',
-      conjunction: 'red'
-    }
+    companionTextLayer: null
   }),
   computed: {
     ...mapState([
@@ -147,6 +136,9 @@ export default {
       'preferences',
       'shouldReset'
     ]),
+    posColors: function () {
+      return this.preferences.posColors.settings
+    },
     // Retrieves only the sentence nodes from the parsed NLCST data
     parsedSentences: function () {
       // We can't do anything if the text hasn't been parsed yet or if we're
@@ -466,7 +458,7 @@ export default {
         case 'adjective':
         case 'article':
           if (word.headTerm) {
-            word.headTerm.highlightColor = this.posColors[word.pos]
+            word.headTerm.highlightColor = this.posColors[word.pos].value
             word.headTerm.isHighlighted = true
           }
           break

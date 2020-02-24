@@ -86,6 +86,53 @@ export default new Vuex.Store({
             description: 'Show companion text along with layer data'
           }
         }
+      },
+      posColors: {
+        type: 'group',
+        description: 'Part of Speech Colors',
+        settings: {
+          shouldHighlightPartsOfSpeech: {
+            type: 'boolean',
+            default: true,
+            value: true,
+            description: 'Change the color of words based on their part of speech'
+          },
+          verb: {
+            type: 'color',
+            default: '#2196F3', // 'blue'
+            value: '#2196F3'
+          },
+          participle: {
+            type: 'color',
+            default: '#4CAF50', // 'green'
+            value: '#4CAF50'
+          },
+          infinitive: {
+            type: 'color',
+            default: '#9c27b0', // 'purple'
+            value: '#9c27b0'
+          },
+          relative: {
+            type: 'color',
+            default: '#ffeb3b', // 'yellow'
+            value: '#ffeb3b'
+          },
+          adjective: {
+            type: 'color',
+            default: '#ff9800', // 'orange'
+            value: '#ff9800'
+          },
+          article: {
+            type: 'color',
+            value: '#9e9e9e', // 'grey'
+            default: '#9e9e9e'
+          },
+          conjunction: {
+            type: 'color',
+            default: '#F44336', // 'red'
+            value: '#F44336'
+          }
+        }
       }
     },
 
