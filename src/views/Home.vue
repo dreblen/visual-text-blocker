@@ -59,6 +59,16 @@
               <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
                 <v-icon>mdi-chevron-right</v-icon>
               </v-btn>
+              <!--
+               If this is not the last word in the layer but its .nextWord value
+               lives in a different layer, insert an icon to visualize that
+               something parenthetical has been extracted into a separate line/layer
+              -->
+              <span
+                v-if="word.nextWord !== null && word.nextWord.layer.id !== word.layer.id && word.layer.words[word.layer.words.length - 1].id !== word.id"
+              >
+                <v-icon>mdi-arrow-expand-horizontal</v-icon>
+              </span>
             </span>
           </p>
           <p v-if="companionTextLayer === layer.id">
