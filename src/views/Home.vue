@@ -262,6 +262,14 @@ export default {
           title: 'Make Layer',
           action: function () {
             _this.pendingActionCallback = function (w) {
+              // If the selected parent word is in our active selection, then
+              // we have to stop now to avoid circular references
+              if (w !== null && this.selectedWords.find((word) => {
+                return word.id === w.id
+              })) {
+                return
+              }
+
               // Store our current state before making changes
               this.$store.commit('saveLayers')
 
@@ -339,6 +347,30 @@ export default {
           title: 'Change Parent',
           action: function () {
             _this.pendingActionCallback = function (w) {
+              if (w !== null) {
+                // If the selected parent word is in our layer(s), we have to stop
+                // to avoid circular references
+                if (this.selectedLayers.find((layer) => {
+                  return layer.id === w.layer.id
+                })) {
+                  return
+                }
+
+                // If the selected parent word is directly or indirectly the child
+                // of our layer(s), then we have to stop to avoid circular references
+                let blacklistLayerIds = []
+                let parent = w.layer.parent
+                while (parent !== null) {
+                  blacklistLayerIds.push(parent.layer.id)
+                  parent = parent.layer.parent
+                }
+                if (this.selectedLayers.find((layer) => {
+                  return blacklistLayerIds.indexOf(layer.id) !== -1
+                })) {
+                  return
+                }
+              }
+
               // Store our current state before making changes
               this.$store.commit('saveLayers')
 
