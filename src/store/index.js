@@ -74,6 +74,15 @@ export default new Vuex.Store({
     layers: [],
     layerHistory: [],
     layerHistoryDepth: 0,
+
+    preferences: {
+      shouldShowCompanionText: {
+        type: Boolean,
+        value: true,
+        description: 'Show companion text along with layer data'
+      }
+    },
+
     shouldReset: false
   },
   getters: {
@@ -88,6 +97,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setPreference: function (state, pref) {
+      state.preferences[pref.name].value = pref.value
+    },
     // Saves the current state of the layers so it can be returned to via history
     saveLayers: function (state) {
       // Discard any redo possibilities past our current history depth

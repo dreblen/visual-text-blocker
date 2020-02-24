@@ -8,6 +8,10 @@ const routeDefinitions = [
   {
     path: '/',
     name: 'Home'
+  },
+  {
+    path: '/preferences',
+    name: 'Preferences'
   }
 ]
 

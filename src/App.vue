@@ -7,6 +7,9 @@
       :hide-on-scroll="true"
     >
       <v-app-bar-nav-icon @click.stop="navOpen = !navOpen" />
+      <v-btn v-if="$route.path !== '/'" icon to="/">
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
       <v-spacer />
       <v-btn icon @click.stop="undo" :disabled="!canUndo">
         <v-icon>mdi-undo</v-icon>
@@ -34,6 +37,14 @@
           </v-list-item-icon>
           <v-list-item-content>
             Start Over
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item to="preferences">
+          <v-list-item-icon>
+            <v-icon>mdi-cogs</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            Preferences
           </v-list-item-content>
         </v-list-item>
       </v-list>

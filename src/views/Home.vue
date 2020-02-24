@@ -1,6 +1,6 @@
 <template>
   <v-container @click="clearSelection" fill-height align-start>
-    <template v-if="parsedText === null">
+    <template v-if="layers.length === 0">
       <v-row>
         <v-col>
           <v-row>
@@ -71,19 +71,21 @@
               </span>
             </span>
           </p>
-          <p v-if="companionTextLayer === layer.id">
-            <v-text-field
-              label="Companion Text"
-              v-model="companionText"
-            />
-            <v-row>
-              <v-spacer />
-              <v-btn @click="$store.commit('saveLayers'); layer.companionText = companionText; companionTextLayer = null">Save</v-btn>
-              <v-btn @click="companionTextLayer = null">Cancel</v-btn>
-            </v-row>
-          </p>
-          <template v-else>
-            <p class="headline">{{ layer.companionText || '' }}</p>
+          <template v-if="preferences.shouldShowCompanionText.value === true">
+            <p v-if="companionTextLayer === layer.id">
+              <v-text-field
+                label="Companion Text"
+                v-model="companionText"
+              />
+              <v-row>
+                <v-spacer />
+                <v-btn @click="$store.commit('saveLayers'); layer.companionText = companionText; companionTextLayer = null">Save</v-btn>
+                <v-btn @click="companionTextLayer = null">Cancel</v-btn>
+              </v-row>
+            </p>
+            <template v-else>
+              <p class="headline">{{ layer.companionText || '' }}</p>
+            </template>
           </template>
         </div>
       </v-col>
@@ -142,6 +144,7 @@ export default {
   computed: {
     ...mapState([
       'layers',
+      'preferences',
       'shouldReset'
     ]),
     // Retrieves only the sentence nodes from the parsed NLCST data
@@ -327,14 +330,16 @@ export default {
         // Single-layer actions
         if (this.selectedLayers.length === 1) {
           // Add companion text
-          actions.push({
-            title: 'Companion Text',
-            action: function () {
-              let layer = _this.selectedLayers[0]
-              _this.companionText = layer.companionText
-              _this.companionTextLayer = layer.id
-            }
-          })
+          if (this.preferences.shouldShowCompanionText.value === true) {
+            actions.push({
+              title: 'Companion Text',
+              action: function () {
+                let layer = _this.selectedLayers[0]
+                _this.companionText = layer.companionText
+                _this.companionTextLayer = layer.id
+              }
+            })
+          }
         }
 
         // Change parent
