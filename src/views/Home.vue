@@ -52,8 +52,8 @@
               @click.stop="wordClicked(word)"
               @mouseover="wordMouseOver(word)"
               @mouseout="wordMouseOut(word)"
-              :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? (word.highlightColor || 'yellow') : '']"
-              :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black'}"
+              :class="[(word.isSelected) ? 'accent' : '']"
+              :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
             >
               {{ word.value }}
               <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
