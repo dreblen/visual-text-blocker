@@ -1,10 +1,8 @@
 // A layer holds words and may be subordinate to a word
-// TODO: Add categorization of the layer type (e.g., sentence, cause, phrase,
-// association [e.g., article/noun, adj/noun]) so we can handle/render them
-// appropriately based on user preference
 var Layer = function () {
   this.id = Math.random()
   this.index = null
+  this.type = null
   this.parent = null // Word
   this.words = []
 
@@ -13,10 +11,25 @@ var Layer = function () {
   this.isSelected = false
 }
 
+// Define some layer types that can be used to handle layer data more specifically
+Layer.types = {
+  Phrase: {
+    Prepositional: 1001,
+    Generic: 1000
+  },
+  Clause: {
+    Independent: 2001,
+    Dependent: 2002,
+    Relative: 2003,
+    Generic: 2000
+  }
+}
+
 Layer.prototype.serialize = function () {
   return JSON.parse(JSON.stringify({
     id: this.id,
     index: this.index,
+    type: this.type,
     parent: (this.parent) ? this.parent.id : null,
     companionText: this.companionText,
     words: this.words.map((word) => {

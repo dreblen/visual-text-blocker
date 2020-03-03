@@ -22,6 +22,7 @@ function unserializeLayers (json) {
     let layer = new Layer()
     layer.id = l.id
     layer.index = l.index
+    layer.type = l.type
     layer.parent = l.parent
     layer.companionText = l.companionText
 

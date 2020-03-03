@@ -374,6 +374,48 @@ export default {
           }
         }
 
+        // Set layer type
+        actions.push({
+          title: 'Set Type',
+          action: function () {
+            _this.pendingActionCallback = function (type) {
+              // Queue up our next action based on the second-level menu
+              _this.pendingActionCallback = function (typeVal) {
+                // Store our current state before making changes
+                _this.$store.commit('saveLayers')
+
+                // Update the type value for our selected layer(s)
+                _this.selectedLayers.forEach((layer) => {
+                  layer.type = typeVal
+                })
+
+                // Finish our selection/action process
+                _this.clearSelection()
+              }
+
+              // Build our list of actions from the specified broad type
+              let types = Layer.types[type]
+              let actions = []
+              for (let type in types) {
+                actions.push({
+                  title: type,
+                  action: () => { _this.pendingActionCallback(types[type]) }
+                })
+              }
+
+              // Show the next menu
+              _this.activeSelectionAction = {
+                actions
+              }
+            }
+            _this.activeSelectionAction = this
+          },
+          actions: [
+            { title: 'Phrase', action: () => { this.pendingActionCallback('Phrase') } },
+            { title: 'Clause', action: () => { this.pendingActionCallback('Clause') } }
+          ]
+        })
+
         // Change parent
         actions.push({
           title: 'Change Parent',
