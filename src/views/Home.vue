@@ -54,10 +54,10 @@
                 @click.stop="wordClicked(word)"
                 @mouseover="wordMouseOver(word)"
                 @mouseout="wordMouseOut(word)"
-                :class="[(word.isSelected) ? 'accent' : '']"
+                :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? 'white--text' : '']"
                 :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
               >
-                <v-icon v-if="word.icon">
+                <v-icon v-if="word.icon" class="white--text">
                   {{ word.icon }}
                 </v-icon>
                 {{ word.value }}
