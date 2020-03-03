@@ -12,6 +12,10 @@ var Word = function () {
   this.prevWord = null
   this.nextWord = null
 
+  // Verbal properties
+  this.verbalSubject = null
+  this.verbalDirectObject = null
+
   // Adjective/Article properties
   this.headTerm = null
 }
@@ -24,6 +28,8 @@ Word.prototype.serialize = function () {
     layer: this.layer.id,
     prevWord: (this.prevWord) ? this.prevWord.id : null,
     nextWord: (this.nextWord) ? this.nextWord.id : null,
+    verbalSubject: (this.verbalSubject) ? this.verbalSubject.id : null,
+    verbalDirectObject: (this.verbalDirectObject) ? this.verbalDirectObject.id : null,
     headTerm: (this.headTerm) ? this.headTerm.id : null
   }))
 }

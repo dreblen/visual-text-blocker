@@ -35,6 +35,8 @@ function unserializeLayers (json) {
       word.layer = layer
       word.prevWord = w.prevWord
       word.nextWord = w.nextWord
+      word.verbalSubject = w.verbalSubject
+      word.verbalDirectObject = w.verbalDirectObject
       word.headTerm = w.headTerm
 
       // Store the word in its new layer
@@ -61,6 +63,12 @@ function unserializeLayers (json) {
     }
     if (word.nextWord !== null) {
       word.nextWord = words[word.nextWord]
+    }
+    if (word.verbalSubject !== null) {
+      word.verbalSubject = words[word.verbalSubject]
+    }
+    if (word.verbalDirectObject !== null) {
+      word.verbalDirectObject = words[word.verbalDirectObject]
     }
     if (word.headTerm !== null) {
       word.headTerm = words[word.headTerm]

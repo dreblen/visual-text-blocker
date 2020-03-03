@@ -57,6 +57,9 @@
                 :class="[(word.isSelected) ? 'accent' : '']"
                 :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
               >
+                <v-icon v-if="word.icon">
+                  {{ word.icon }}
+                </v-icon>
                 {{ word.value }}
                 <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
                   <v-icon>mdi-chevron-right</v-icon>
@@ -238,6 +241,51 @@ export default {
         // Single-word actions
         if (this.selectedWords.length === 1) {
           let word = this.selectedWords[0]
+          // Verbal actions
+          if (['verb', 'participle', 'infinitive'].indexOf(word.pos) !== -1) {
+            // Mark subject
+            actions.push({
+              title: 'Subject',
+              target: 'Word',
+              action: function () {
+                _this.pendingActionCallback = function (w) {
+                  // Store our current state before making changes
+                  this.$store.commit('saveLayers')
+
+                  // Set our word's subject
+                  word.verbalSubject = w
+
+                  // Finish our selection/action process
+                  _this.clearSelection()
+                }
+                _this.pendingActionTarget = 'Word'
+                _this.activeSelectionAction = this
+              },
+              instructions: 'Select a word as this verbal\'s subject'
+            })
+
+            // Mark direct object
+            actions.push({
+              title: 'Direct Object',
+              target: 'Word',
+              action: function () {
+                _this.pendingActionCallback = function (w) {
+                  // Store our current state before making changes
+                  this.$store.commit('saveLayers')
+
+                  // Set our word's subject
+                  word.verbalDirectObject = w
+
+                  // Finish our selection/action process
+                  _this.clearSelection()
+                }
+                _this.pendingActionTarget = 'Word'
+                _this.activeSelectionAction = this
+              },
+              instructions: 'Select a word as this verbal\'s direct object'
+            })
+          }
+
           // Adjective/Article actions
           if (['adjective', 'article'].indexOf(word.pos) !== -1) {
             // Mark head term
@@ -584,27 +632,32 @@ export default {
       layer.isSelected = !layer.isSelected
     },
     wordMouseOver: function (word) {
-      // Part-of-speech-specific logic
-      switch (word.pos) {
-        case 'adjective':
-        case 'article':
-          if (word.headTerm) {
-            word.headTerm.highlightColor = this.posColors[word.pos].value
-            word.headTerm.isHighlighted = true
+      [
+        { name: 'verbalSubject', icon: 'mdi-alpha-s-box-outline' },
+        { name: 'verbalDirectObject', icon: 'mdi-alpha-o-box-outline' },
+        { name: 'headTerm' }
+      ].forEach((prop) => {
+        if (word[prop.name]) {
+          word[prop.name].highlightColor = this.posColors[word.pos].value
+          word[prop.name].isHighlighted = true
+          if (prop.icon) {
+            word[prop.name].icon = prop.icon
           }
-          break
-      }
+        }
+      })
     },
     wordMouseOut: function (word) {
-      // Part-of-speech-specific logic
-      switch (word.pos) {
-        case 'adjective':
-        case 'article':
-          if (word.headTerm) {
-            word.headTerm.isHighlighted = false
-          }
-          break
-      }
+      [
+        'verbalSubject',
+        'verbalDirectObject',
+        'headTerm'
+      ].forEach((prop) => {
+        if (word[prop]) {
+          word[prop].isHighlighted = false
+          word[prop].highlightColor = null
+          word[prop].icon = null
+        }
+      })
     },
     wordClicked: function (word) {
       // If we have a callback queued, use that instead of our default logic
