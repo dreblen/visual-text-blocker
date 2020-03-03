@@ -343,6 +343,10 @@ export default {
             title: 'Change Order',
             action: function () {
               _this.pendingActionCallback = function (l) {
+                // Store our current state before making changes
+                this.$store.commit('saveLayers')
+
+                // Move the selected layer
                 _this.$store.dispatch('moveLayerToIndex', {
                   layer: _this.selectedLayers[0],
                   index: l.index
