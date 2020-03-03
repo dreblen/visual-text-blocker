@@ -118,6 +118,34 @@
         </v-row>
       </v-footer>
     </v-expand-transition>
+    <v-dialog
+      v-model="shouldShowWordSplitDialog"
+    >
+      <v-card>
+        <v-card-title>
+          Split Word
+        </v-card-title>
+        <v-card-text>
+          <p class="display-3 text-center">
+            <span v-for="(letter, i) in wordSplitText" :key="i">
+              <span :class="(i < wordSplitIndex) ? 'yellow--text' : 'blue--text'">{{ letter }}</span>
+              <span v-if="i === wordSplitIndex - 1">|</span>
+            </span>
+          </p>
+          <v-slider
+            v-model="wordSplitIndex"
+            step="1"
+            :min="1"
+            :max="wordSplitText.length - 1"
+            ticks
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="dialogPendingAction">Split</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -133,6 +161,12 @@ export default {
     // Text and layers
     rawText: '',
     parsedText: null,
+
+    // Word-splitting dialog
+    dialogPendingAction: null,
+    shouldShowWordSplitDialog: false,
+    wordSplitText: '',
+    wordSplitIndex: 0,
 
     // Actions and selections
     activeSelectionAction: null,
@@ -309,6 +343,40 @@ export default {
               instructions: 'Select a word as this word\'s head term'
             })
           }
+
+          // Split a word into two words
+          actions.push({
+            title: 'Split',
+            target: 'Word',
+            action: function () {
+              _this.wordSplitText = _this.selectedWords[0].value
+              _this.dialogPendingAction = () => {
+                // Store our current state before making changes
+                _this.$store.commit('saveLayers')
+
+                // Change the value of our word
+                let word = _this.selectedWords[0]
+                word.value = _this.wordSplitText.slice(0, _this.wordSplitIndex)
+
+                // Add a new word with the rest of the value
+                let w = new Word()
+                w.value = _this.wordSplitText.slice(_this.wordSplitIndex)
+                w.layer = word.layer
+                w.layer.words.splice(1 + w.layer.words.findIndex(s => s.id === word.id), 0, w)
+
+                // Update connections
+                w.nextWord = word.nextWord
+                word.nextWord.prevWord = w
+                word.nextWord = w
+                w.prevWord = word
+
+                // Finish our selection/action process
+                _this.clearSelection()
+              }
+              _this.wordSplitIndex = 0
+              _this.shouldShowWordSplitDialog = true
+            }
+          })
         }
 
         // Mark part of speech (has sub menu)
@@ -685,6 +753,8 @@ export default {
     clearSelection: function () {
       this.selectedWords.forEach((w) => { w.isSelected = false })
       this.selectedLayers.forEach((l) => { l.isSelected = false })
+
+      this.shouldShowWordSplitDialog = false
 
       this.activeSelectionAction = null
       this.pendingActionCallback = null
