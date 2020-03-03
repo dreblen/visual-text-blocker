@@ -41,7 +41,7 @@
               @mouseover="layerMouseOver(layer)"
               @mouseout="layerMouseOut(layer)"
             >
-              mdi-drag
+              {{ layerIcon }}
             </v-icon>
             <v-icon v-for="i in layer.getNumParents()" :key="i" class="mx-3">
               mdi-keyboard-tab
@@ -127,15 +127,29 @@ export default {
     // Actions and selections
     activeSelectionAction: null,
     pendingActionCallback: null,
+    pendingActionTarget: null,
     companionText: null,
     companionTextLayer: null
   }),
   computed: {
     ...mapState([
-      'layers',
       'preferences',
       'shouldReset'
     ]),
+    layers: function () {
+      return this.$store.state.layers.slice(0).sort((a, b) => {
+        if (a.index < b.index) {
+          return -1
+        }
+        if (a.index > b.index) {
+          return 1
+        }
+        return 0
+      })
+    },
+    layerIcon: function () {
+      return (this.pendingActionTarget === 'Layer' && this.pendingActionCallback !== null) ? 'mdi-bullseye-arrow' : 'mdi-drag'
+    },
     posColors: function () {
       return this.preferences.posColors.settings
     },
@@ -201,6 +215,7 @@ export default {
           action: function () {
             _this.activeSelectionAction = null
             _this.pendingActionCallback = null
+            _this.pendingActionTarget = null
           }
         })
 
@@ -228,6 +243,7 @@ export default {
                   // Finish our selection/action process
                   _this.clearSelection()
                 }
+                _this.pendingActionTarget = 'Word'
                 _this.activeSelectionAction = this
               },
               instructions: 'Select a word as this word\'s head term'
@@ -295,27 +311,20 @@ export default {
 
               // Add our layer to the global list after the parent word's layer
               // (or the first selected word's layer if there's no parent)
-              let index = 0
-              let targetID = previousLayer.id
+              let targetLayer = previousLayer
               if (w !== null) {
-                targetID = w.layer.id
-              }
-              for (let i in _this.layers) {
-                let layer = _this.layers[i]
-                if (layer.id === targetID) {
-                  index = parseInt(i) + 1
-                  break
-                }
+                targetLayer = w.layer
               }
               // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-              _this.$store.commit('spliceLayers', {
-                index,
+              _this.$store.dispatch('insertLayerAtIndex', {
+                index: targetLayer.index + 1,
                 layer
               })
 
               // Finish our selection/action process
               _this.clearSelection()
             }
+            _this.pendingActionTarget = 'Word'
             _this.activeSelectionAction = this
           },
           actions: [
@@ -329,6 +338,25 @@ export default {
       if (this.selectedLayers.length > 0) {
         // Single-layer actions
         if (this.selectedLayers.length === 1) {
+          // Change order
+          actions.push({
+            title: 'Change Order',
+            action: function () {
+              _this.pendingActionCallback = function (l) {
+                _this.$store.dispatch('moveLayerToIndex', {
+                  layer: _this.selectedLayers[0],
+                  index: l.index
+                })
+
+                // Finish our selection/action process
+                _this.clearSelection()
+              }
+              _this.pendingActionTarget = 'Layer'
+              _this.activeSelectionAction = this
+            },
+            instructions: 'Select a new location for this layer'
+          })
+
           // Add companion text
           if (this.preferences.display.settings.shouldShowCompanionText.value === true) {
             actions.push({
@@ -382,6 +410,7 @@ export default {
               // Finish our selection/action process
               _this.clearSelection()
             }
+            _this.pendingActionTarget = 'Word'
             _this.activeSelectionAction = this
           },
           actions: [
@@ -429,6 +458,7 @@ export default {
       for (let sentence of this.parsedSentences) {
         // Make a new layer
         let layer = new Layer()
+        layer.index = layers.length
         // Convert all the words in the sentence into a Word object
         for (let child of sentence.children) {
           if (child.type !== 'WordNode' || child.children.length === 0) {
@@ -482,6 +512,11 @@ export default {
       }
     },
     layerClicked: function (layer) {
+      // If we have a callback queued, use that instead of our default logic
+      if (this.pendingActionTarget === 'Layer' && this.pendingActionCallback !== null) {
+        return this.pendingActionCallback(layer)
+      }
+
       layer.isSelected = !layer.isSelected
     },
     wordMouseOver: function (word) {
@@ -509,7 +544,7 @@ export default {
     },
     wordClicked: function (word) {
       // If we have a callback queued, use that instead of our default logic
-      if (this.pendingActionCallback !== null) {
+      if (this.pendingActionTarget === 'Word' && this.pendingActionCallback !== null) {
         return this.pendingActionCallback(word)
       }
 
@@ -531,6 +566,7 @@ export default {
 
       this.activeSelectionAction = null
       this.pendingActionCallback = null
+      this.pendingActionTarget = null
     }
   }
 }

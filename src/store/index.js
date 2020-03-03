@@ -21,7 +21,7 @@ function unserializeLayers (json) {
     // Make a new layer with the right values
     let layer = new Layer()
     layer.id = l.id
-    layer.order = l.order
+    layer.index = l.index
     layer.parent = l.parent
     layer.companionText = l.companionText
 
@@ -166,9 +166,6 @@ export default new Vuex.Store({
     setLayers: function (state, layers) {
       state.layers = layers
     },
-    spliceLayers: function (state, payload) {
-      state.layers.splice(payload.index, 0, payload.layer)
-    },
     importLayers: function (state, json) {
       state.layers = unserializeLayers(json)
     }
@@ -188,6 +185,50 @@ export default new Vuex.Store({
       Vue.nextTick(() => {
         state.shouldReset = false
       })
+    },
+    // Updates index values for any layers necessary in order to accommodate
+    // putting a layer at the specified location, then sets the index for the
+    // layer to that location. Payload must contain 'index' where to put the
+    // layer, and 'layer' as the layer we want to put there.
+    moveLayerToIndex: function ({ state }, payload) {
+      // Don't do anything if our layer is already at the requested index
+      if (payload.layer.index === payload.index) {
+        return
+      }
+
+      // Check which direction we need to move index values
+      if (payload.layer.index === null || payload.layer.index > payload.index) {
+        // - Move index values up
+        let upperLimit = state.layers.length
+        if (payload.layer.index !== null) {
+          upperLimit = payload.layer.index
+        }
+        state.layers.filter(layer => layer.index >= payload.index && layer.index < upperLimit).forEach((layer) => {
+          layer.index++
+        })
+      } else {
+        // - Move index values down
+        let lowerLimit = 0
+        if (payload.layer.index !== null) {
+          lowerLimit = payload.layer.index
+        }
+        state.layers.filter(layer => layer.index <= payload.index && layer.index > lowerLimit).forEach((layer) => {
+          layer.index--
+        })
+      }
+
+      // Set the index value for our working layer
+      payload.layer.index = payload.index
+    },
+    // Adds a passed Layer object as a new layer in the global list. Payload
+    // must contain 'index' where to put the layer, and 'layer' as the layer we
+    // want to put there.
+    insertLayerAtIndex: function ({ state, dispatch }, payload) {
+      // Accommodate our new layer
+      dispatch('moveLayerToIndex', payload)
+
+      // Put the new layer into our layer list
+      state.layers.splice(payload.index, 0, payload.layer)
     },
     undo: function ({ state, getters, commit }) {
       // See if we're able to go back any further

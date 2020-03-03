@@ -4,7 +4,7 @@
 // appropriately based on user preference
 var Layer = function () {
   this.id = Math.random()
-  this.order = null
+  this.index = null
   this.parent = null // Word
   this.words = []
 
@@ -16,7 +16,7 @@ var Layer = function () {
 Layer.prototype.serialize = function () {
   return JSON.parse(JSON.stringify({
     id: this.id,
-    order: this.order,
+    index: this.index,
     parent: (this.parent) ? this.parent.id : null,
     companionText: this.companionText,
     words: this.words.map((word) => {
