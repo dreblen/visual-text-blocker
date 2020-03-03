@@ -32,47 +32,52 @@
     <v-row>
       <v-col>
         <div v-for="layer in layers" :key="layer.id">
-          <p
-            v-if="shouldRenderLayer(layer)"
-            :class="['display-1', (layer.isSelected) ? 'primary' : '']"
-            style="border-radius: 10px;"
-          >
-            <v-icon
-              @click.stop="layerClicked(layer)"
-              @mouseover="layerMouseOver(layer)"
-              @mouseout="layerMouseOut(layer)"
+          <template>
+            <p
+              v-if="shouldRenderLayer(layer)"
+              :class="['display-1', (layer.isSelected) ? 'primary' : '']"
+              style="border-radius: 10px;"
             >
-              {{ layerIcon }}
-            </v-icon>
-            <v-icon v-for="i in layer.getNumParents()" :key="i" class="mx-3">
-              mdi-keyboard-tab
-            </v-icon>
-            <span
-              v-for="word in layer.words"
-              :key="word.id"
-              @click.stop="wordClicked(word)"
-              @mouseover="wordMouseOver(word)"
-              @mouseout="wordMouseOut(word)"
-              :class="[(word.isSelected) ? 'accent' : '']"
-              :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
-            >
-              {{ word.value }}
-              <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
-                <v-icon>mdi-chevron-right</v-icon>
-              </v-btn>
-              <!--
-               If this is not the last word in the layer but its .nextWord value
-               lives in a different layer, insert an icon to visualize that
-               something parenthetical has been extracted into a separate line/layer
-              -->
-              <span
-                v-if="word.nextWord !== null && word.nextWord.layer.id !== word.layer.id && word.layer.words[word.layer.words.length - 1].id !== word.id"
+              <v-icon
+                @click.stop="layerClicked(layer)"
+                @mouseover="layerMouseOver(layer)"
+                @mouseout="layerMouseOut(layer)"
               >
-                <v-icon>mdi-arrow-expand-horizontal</v-icon>
+                {{ layerIcon }}
+              </v-icon>
+              <v-icon v-for="i in layer.getNumParents()" :key="i" class="mx-3">
+                mdi-keyboard-tab
+              </v-icon>
+              <span
+                v-for="word in layer.words"
+                :key="word.id"
+                @click.stop="wordClicked(word)"
+                @mouseover="wordMouseOver(word)"
+                @mouseout="wordMouseOut(word)"
+                :class="[(word.isSelected) ? 'accent' : '']"
+                :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
+              >
+                {{ word.value }}
+                <v-btn icon v-if="word.isSelected && word.nextWord && word.nextWord.layer.id === word.layer.id && !word.nextWord.isSelected" @click.stop="extendSelection(word)">
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+                <!--
+                 If this is not the last word in the layer but its .nextWord value
+                 lives in a different layer, insert an icon to visualize that
+                 something parenthetical has been extracted into a separate line/layer
+                -->
+                <span
+                  v-if="word.nextWord !== null && word.nextWord.layer.id !== word.layer.id && word.layer.words[word.layer.words.length - 1].id !== word.id"
+                >
+                  <v-icon>mdi-arrow-expand-horizontal</v-icon>
+                </span>
               </span>
-            </span>
-          </p>
-          <template v-if="preferences.display.settings.shouldShowCompanionText.value === true">
+            </p>
+            <p v-else class="text-center">
+              <v-icon>mdi-dots-horizontal</v-icon>
+            </p>
+          </template>
+          <template v-if="preferences.display.settings.shouldShowCompanionText.value === true && shouldRenderLayer(layer)">
             <p v-if="companionTextLayer === layer.id">
               <v-text-field
                 label="Companion Text"
