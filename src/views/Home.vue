@@ -100,7 +100,8 @@
         <v-row>
           <v-row class="overflow-x-auto pb-3" style="width: 100vw; flex-wrap: nowrap;">
             <v-col v-for="action in selectionActions" :key="action.title">
-              <v-btn @click.stop="action.action">
+              <v-btn block @click.stop="action.action">
+                <v-icon v-if="action.target" left>{{ action.target === 'Layer' ? 'mdi-text' : 'mdi-alphabetical' }}</v-icon>
                 {{ action.title }}
               </v-btn>
             </v-col>
@@ -232,6 +233,7 @@ export default {
             // Mark head term
             actions.push({
               title: 'Head Term',
+              target: 'Word',
               action: function () {
                 _this.pendingActionCallback = function (w) {
                   // Store our current state before making changes
@@ -254,6 +256,7 @@ export default {
         // Mark part of speech (has sub menu)
         actions.push({
           title: 'Part of Speech',
+          target: 'Word',
           action: function () {
             _this.activeSelectionAction = this
           },
@@ -276,6 +279,7 @@ export default {
         // Create a layer
         actions.push({
           title: 'Make Layer',
+          target: 'Word',
           action: function () {
             _this.pendingActionCallback = function (w) {
               // If the selected parent word is in our active selection, then
@@ -341,6 +345,7 @@ export default {
           // Change order
           actions.push({
             title: 'Change Order',
+            target: 'Layer',
             action: function () {
               _this.pendingActionCallback = function (l) {
                 // Store our current state before making changes
@@ -365,6 +370,7 @@ export default {
           if (this.preferences.display.settings.shouldShowCompanionText.value === true) {
             actions.push({
               title: 'Companion Text',
+              target: 'Layer',
               action: function () {
                 let layer = _this.selectedLayers[0]
                 _this.companionText = layer.companionText
@@ -377,6 +383,7 @@ export default {
         // Set layer type
         actions.push({
           title: 'Set Type',
+          target: 'Layer',
           action: function () {
             _this.pendingActionCallback = function (type) {
               // Queue up our next action based on the second-level menu
@@ -419,6 +426,7 @@ export default {
         // Change parent
         actions.push({
           title: 'Change Parent',
+          target: 'Layer',
           action: function () {
             _this.pendingActionCallback = function (w) {
               if (w !== null) {
