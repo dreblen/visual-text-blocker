@@ -137,8 +137,8 @@ export default new Vuex.Store({
           },
           relative: {
             type: 'color',
-            default: '#ffeb3b', // 'yellow'
-            value: '#ffeb3b'
+            default: '#fdd835', // 'yellow darken-1'
+            value: '#fdd835'
           },
           adjective: {
             type: 'color',

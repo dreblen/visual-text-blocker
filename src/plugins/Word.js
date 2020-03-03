@@ -7,7 +7,7 @@ var Word = function () {
 
   this.isSelected = false
   this.isHighlighted = false
-  this.highlightColor = 'yellow'
+  this.highlightColor = '#FDD835' // yellow darken-1
 
   this.prevWord = null
   this.nextWord = null

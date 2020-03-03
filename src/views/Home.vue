@@ -55,7 +55,7 @@
                 @mouseover="wordMouseOver(word)"
                 @mouseout="wordMouseOut(word)"
                 :class="[(word.isSelected) ? 'accent' : '', (word.isHighlighted) ? 'white--text' : '']"
-                :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || 'yellow') : ''}"
+                :style="{borderRadius: '10px', color: (posColors.shouldHighlightPartsOfSpeech.value === true && posColors[word.pos]) ? posColors[word.pos].value : 'black', backgroundColor: (word.isHighlighted) ? (word.highlightColor || '#FDD835') : ''}"
               >
                 <v-icon v-if="word.icon" class="white--text">
                   {{ word.icon }}
@@ -128,7 +128,7 @@
         <v-card-text>
           <p class="display-3 text-center">
             <span v-for="(letter, i) in wordSplitText" :key="i">
-              <span :class="(i < wordSplitIndex) ? 'yellow--text' : 'blue--text'">{{ letter }}</span>
+              <span :class="(i < wordSplitIndex) ? 'yellow--text text--darken-1' : 'blue--text'">{{ letter }}</span>
               <span v-if="i === wordSplitIndex - 1">|</span>
             </span>
           </p>
