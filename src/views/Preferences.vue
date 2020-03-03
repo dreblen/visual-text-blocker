@@ -24,6 +24,23 @@
                 {{ name }}
               </v-btn>
             </template>
+            <template v-else-if="pref.type === 'array'">
+              <h3>{{ pref.description }}</h3>
+              <v-chip-group
+                v-model="pref.value"
+                multiple
+                column
+                @change="preferenceChanged(groupName, name, pref.value)"
+              >
+                <v-chip
+                  v-for="o in pref.options"
+                  :key="o"
+                  filter
+                >
+                  {{ o }}
+                </v-chip>
+              </v-chip-group>
+            </template>
           </v-col>
         </v-row>
       </v-col>

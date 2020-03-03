@@ -33,6 +33,7 @@
       <v-col>
         <div v-for="layer in layers" :key="layer.id">
           <p
+            v-if="shouldRenderLayer(layer)"
             :class="['display-1', (layer.isSelected) ? 'primary' : '']"
             style="border-radius: 10px;"
           >
@@ -113,7 +114,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import Layer from '@/plugins/Layer'
 import Word from '@/plugins/Word'
 let Latin = require('parse-latin')
@@ -136,6 +137,10 @@ export default {
     ...mapState([
       'preferences',
       'shouldReset'
+    ]),
+    ...mapGetters([
+      'hiddenLayerPhraseTypes',
+      'hiddenLayerClauseTypes'
     ]),
     layers: function () {
       return this.$store.state.layers.slice(0).sort((a, b) => {
@@ -603,6 +608,11 @@ export default {
       }
 
       word.isSelected = !word.isSelected
+    },
+    // Based on user preferences, return whether or not to show this layer
+    shouldRenderLayer: function (layer) {
+      return this.hiddenLayerPhraseTypes.indexOf(layer.type) === -1 &&
+        this.hiddenLayerClauseTypes.indexOf(layer.type) === -1
     },
     // From the specified word, mark each remaining word in the layer as selected
     extendSelection: function (word) {

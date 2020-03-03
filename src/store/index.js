@@ -85,6 +85,20 @@ export default new Vuex.Store({
             default: true,
             value: true,
             description: 'Show companion text along with layer data'
+          },
+          shouldHideLayerPhraseTypes: {
+            type: 'array',
+            default: [],
+            value: [],
+            options: Object.keys(Layer.types.Phrase).reduce((c, t) => { c.push(t); return c }, []),
+            description: 'Hide phrase layers based on their specified type'
+          },
+          shouldHideLayerClauseTypes: {
+            type: 'array',
+            default: [],
+            value: [],
+            options: Object.keys(Layer.types.Clause).reduce((c, t) => { c.push(t); return c }, []),
+            description: 'Hide clause layers based on their specified type'
           }
         }
       },
@@ -142,6 +156,20 @@ export default new Vuex.Store({
   getters: {
     serializedLayers: function (state) {
       return serializeLayers(state.layers)
+    },
+    hiddenLayerPhraseTypes: function (state) {
+      return state.preferences.display.settings.shouldHideLayerPhraseTypes.options.filter((o, i) => {
+        return state.preferences.display.settings.shouldHideLayerPhraseTypes.value.indexOf(i) !== -1
+      }).map((t) => {
+        return Layer.types.Phrase[t]
+      })
+    },
+    hiddenLayerClauseTypes: function (state) {
+      return state.preferences.display.settings.shouldHideLayerClauseTypes.options.filter((o, i) => {
+        return state.preferences.display.settings.shouldHideLayerClauseTypes.value.indexOf(i) !== -1
+      }).map((t) => {
+        return Layer.types.Clause[t]
+      })
     },
     canUndo: function (state) {
       return state.layerHistory.length > 0 && state.layerHistoryDepth !== state.layerHistory.length
